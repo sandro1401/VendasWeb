@@ -1,0 +1,73 @@
+﻿@model IEnumerable<VendasWeb.Models.Cliente>
+
+@{
+    ViewData["Title"] = "Clientes";
+}
+<header class="d-flex justify-content-between align-items-center">
+    <div>
+        <h1 class="text-primary">@ViewBag.Subtitulo</h1>
+    </div>
+    <div>
+        <a asp-action="Create" class="btn btn-primary">Novo Cliente</a>
+    </div>
+</header>
+
+@if(Model.Count() > 0)
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>
+                    @Html.DisplayNameFor(model => model.CPF)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.DataNascimento)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Nome)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Email)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Senha)
+                </th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.CPF)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.DataNascimento)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Nome)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Email)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Senha)
+                    </td>
+                    <td>
+                        <a asp-action="Index" asp-controller="Pedido" asp-route-cid="@item.IdUsuario" class="btn btn-sm btn-info"><i class="bi-cart" title="Pedidos"></i></a>
+                        <a asp-action="Index" asp-controller="Endereco" asp-route-cid="@item.IdUsuario" class="btn btn-sm btn-success"><i class="bi-mailbox" title="Endereços"></i></a>
+                        <a asp-action="Edit" asp-route-id="@item.IdUsuario">Edit</a> |
+                        <a asp-action="Details" asp-route-id="@item.IdUsuario">Details</a> |
+                        <a asp-action="Delete" asp-route-id="@item.IdUsuario">Delete</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+}
+else
+{
+    <p>Não há nenhum cliente cadastrado.</p>
+}
