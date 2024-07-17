@@ -22,7 +22,7 @@ namespace VendasWeb.Controllers
         // GET: Produtoes
         public async Task<IActionResult> Index()
         {
-            var vendasWebContext = _context.Produto.Include(p => p.Categoria);
+            var vendasWebContext = _context.Produto.Include(p => p.Categoria).AsNoTracking();
             return View(await vendasWebContext.ToListAsync());
         }
 
@@ -46,10 +46,12 @@ namespace VendasWeb.Controllers
         }
 
         // GET: Produtoes/Create
-        public IActionResult Create()
+        public async Task<IActionResult> Create(int? id)
         {
             ViewData["IdCategoria"] = new SelectList(_context.Categoria, "IdCategoria", "Nome");
-            return View();
+           
+           
+            return View(new Produto());
         }
 
         // POST: Produtoes/Create
@@ -57,16 +59,15 @@ namespace VendasWeb.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("IdProduto,Nome,Estoque,Preco,IdCategoria")] Produto produto)
+        public async Task<IActionResult> Create(int? id,[FromForm] Produto produto)
         {
-            if (ModelState.IsValid)
-            {
+           
                 _context.Add(produto);
                 await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
+               
+            
             ViewData["IdCategoria"] = new SelectList(_context.Categoria, "IdCategoria", "Nome", produto.IdCategoria);
-            return View(produto);
+            return RedirectToAction(nameof(Index));
         }
 
         // GET: Produtoes/Edit/5
@@ -77,7 +78,7 @@ namespace VendasWeb.Controllers
                 return NotFound();
             }
 
-            var produto = await _context.Produto.FindAsync(id);
+            var produto = _context.Produto.FirstOrDefault(p => p.IdProduto == id);
             if (produto == null)
             {
                 return NotFound();
@@ -98,28 +99,13 @@ namespace VendasWeb.Controllers
                 return NotFound();
             }
 
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    _context.Update(produto);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!ProdutoExists(produto.IdProduto))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
-            }
+           
+            _context.Update(produto);
+            await _context.SaveChangesAsync();
+            
             ViewData["IdCategoria"] = new SelectList(_context.Categoria, "IdCategoria", "Nome", produto.IdCategoria);
-            return View(produto);
+        
+            return RedirectToAction(nameof(Index));
         }
 
         // GET: Produtoes/Delete/5
