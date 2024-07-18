@@ -20,9 +20,27 @@ namespace VendasWeb.Controllers
         }
 
         // GET: Enderecoes
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int? id)
         {
-            return View(await _context.Endereco.ToListAsync());
+            if (id.HasValue)
+            {
+                var cliente = await _context.Cliente.FindAsync(id);
+                if (cliente != null)
+                {
+                    _context.Entry(cliente).Collection(c => c.Enderecos).Load();
+                    ViewBag.Cliente = cliente;
+                    return View(cliente.Enderecos);
+                }
+                else
+                {
+                    return RedirectToAction("Index", "Clientes");
+                }
+            }
+            else
+            {
+                return RedirectToAction("Index", "clientes");
+            
+            }
         }
 
         // GET: Enderecoes/Details/5
@@ -33,8 +51,16 @@ namespace VendasWeb.Controllers
                 return NotFound();
             }
 
-            var endereco = await _context.Endereco
-                .FirstOrDefaultAsync(m => m.IdEndereco == id);
+            var cliente = await _context.Cliente
+                .Include(c => c.Enderecos)
+                .FirstOrDefaultAsync(c => c.Enderecos.Any(e => e.IdEndereco == id));
+
+            if (cliente == null)
+            {
+                return NotFound();
+            }
+
+            var endereco = cliente.Enderecos.FirstOrDefault(e => e.IdEndereco == id);
             if (endereco == null)
             {
                 return NotFound();
@@ -44,8 +70,17 @@ namespace VendasWeb.Controllers
         }
 
         // GET: Enderecoes/Create
-        public IActionResult Create()
+        public async Task<IActionResult>  Create(int? id)
         {
+            if (id.HasValue)
+            {
+                var cliente = await _context.Cliente.FindAsync(id);
+                if (cliente != null)
+                {
+                    ViewBag.Cliente = cliente;
+                }
+
+            }
             return View();
         }
 
@@ -54,16 +89,33 @@ namespace VendasWeb.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("IdEndereco,Logradouro,Numero,Complemento,Bairro,Cidade,Estado,CEP,Referencia,Selecionado")] Endereco endereco)
+        public async Task<IActionResult> Create([ Bind("IdEndereco,Logradouro,Numero,Complemento,Bairro,Cidade,Estado,CEP,Referencia,Selecionado")] int? idUsuario, Endereco endereco)
         {
-            if (ModelState.IsValid)
+            if (!idUsuario.HasValue)
             {
-                _context.Add(endereco);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction("index", "Clientes");
             }
-            return View(endereco);
+            
+            var cliente = await _context.Cliente
+                .Include(c => c.Enderecos)
+                .FirstOrDefaultAsync(c => c.IdUsuario == idUsuario);
+            ViewBag.Cliente = cliente;
+          
+            
+                if (cliente.Enderecos.Count() == 0) endereco.Selecionado = true;
+                endereco.CEP = ObterCepNormalizado(endereco.CEP);
+                    
+               
+                cliente.Enderecos.Add(endereco); ;
+                
+                await _context.SaveChangesAsync();
+                return RedirectToAction("Index", new {id = idUsuario} );
+            
+           // ViewBag.Cliente = cliente;
+            //return View(endereco);
+            
         }
+           
 
         // GET: Enderecoes/Edit/5
         public async Task<IActionResult> Edit(int? id)
@@ -73,11 +125,21 @@ namespace VendasWeb.Controllers
                 return NotFound();
             }
 
-            var endereco = await _context.Endereco.FindAsync(id);
+            var cliente = await _context.Cliente
+                .Include(c => c.Enderecos)
+                .FirstOrDefaultAsync(c => c.Enderecos.Any(e => e.IdEndereco == id));
+
+            if (cliente == null)
+            {
+                return NotFound();
+            }
+
+            var endereco = cliente.Enderecos.FirstOrDefault(e => e.IdEndereco == id);
             if (endereco == null)
             {
                 return NotFound();
             }
+
             return View(endereco);
         }
 
@@ -93,11 +155,38 @@ namespace VendasWeb.Controllers
                 return NotFound();
             }
 
+
             if (ModelState.IsValid)
             {
                 try
                 {
-                    _context.Update(endereco);
+                    var cliente = await _context.Cliente
+                        .Include(c => c.Enderecos)
+                        .FirstOrDefaultAsync(c => c.Enderecos.Any(e => e.IdEndereco == id));
+
+                    if (cliente == null)
+                    {
+                        return NotFound();
+                    }
+
+                    var enderecoExistente = cliente.Enderecos.FirstOrDefault(e => e.IdEndereco == id);
+                    if (enderecoExistente == null)
+                    {
+                        return NotFound();
+                    }
+
+                    // Atualize as propriedades do endereço existente
+                    enderecoExistente.Logradouro = endereco.Logradouro;
+                    enderecoExistente.Numero = endereco.Numero;
+                    enderecoExistente.Complemento = endereco.Complemento;
+                    enderecoExistente.Bairro = endereco.Bairro;
+                    enderecoExistente.Cidade = endereco.Cidade;
+                    enderecoExistente.Estado = endereco.Estado;
+                    enderecoExistente.CEP = endereco.CEP;
+                    enderecoExistente.Referencia = endereco.Referencia;
+                    enderecoExistente.Selecionado = endereco.Selecionado;
+
+                    _context.Update(cliente);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
@@ -124,8 +213,16 @@ namespace VendasWeb.Controllers
                 return NotFound();
             }
 
-            var endereco = await _context.Endereco
-                .FirstOrDefaultAsync(m => m.IdEndereco == id);
+            var cliente = await _context.Cliente
+                .Include(c => c.Enderecos)
+                .FirstOrDefaultAsync(c => c.Enderecos.Any(e => e.IdEndereco == id));
+
+            if (cliente == null)
+            {
+                return NotFound();
+            }
+
+            var endereco = cliente.Enderecos.FirstOrDefault(e => e.IdEndereco == id);
             if (endereco == null)
             {
                 return NotFound();
@@ -139,19 +236,37 @@ namespace VendasWeb.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var endereco = await _context.Endereco.FindAsync(id);
-            if (endereco != null)
+            var cliente = await _context.Cliente
+        .Include(c => c.Enderecos)
+        .FirstOrDefaultAsync(c => c.Enderecos.Any(e => e.IdEndereco == id));
+
+            if (cliente == null)
             {
-                _context.Endereco.Remove(endereco);
+                return NotFound();
             }
 
-            await _context.SaveChangesAsync();
+            var endereco = cliente.Enderecos.FirstOrDefault(e => e.IdEndereco == id);
+            if (endereco != null)
+            {
+                cliente.Enderecos.Remove(endereco);
+                _context.Update(cliente);
+                await _context.SaveChangesAsync();
+            }
+
             return RedirectToAction(nameof(Index));
         }
 
         private bool EnderecoExists(int id)
         {
-            return _context.Endereco.Any(e => e.IdEndereco == id);
+            return _context.Cliente
+            .Include(c => c.Enderecos)
+            .Any(c => c.Enderecos.Any(e => e.IdEndereco == id));
+        }
+
+        private string ObterCepNormalizado(string cep)
+        {
+            string cepNormalizado = cep.Replace("-", "").Replace(".", "").Trim();
+            return cepNormalizado.Insert(5, "-");
         }
     }
 }

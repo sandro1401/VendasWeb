@@ -16,7 +16,20 @@ public class VendasWebContext : IdentityDbContext<VendasWebUser>
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
-        
+        builder.Entity<Cliente>()
+               .OwnsMany(c => c.Enderecos, e =>
+               {
+                   e.WithOwner().HasForeignKey("IdUsuario");
+                   e.HasKey("IdUsuario", "IdEndereco");
+               });
+        builder.Entity<Pedido>().
+            OwnsOne(p => p.EnderecoEntrega, e =>
+            {
+                e.Ignore(e => e.IdEndereco);
+                e.Ignore(e => e.Selecionado);
+                e.ToTable("Pedido");
+
+            });
         base.OnModelCreating(builder);
         // Customize the ASP.NET Identity model and override the defaults if needed.
         // For example, you can rename the ASP.NET Identity table names and more.

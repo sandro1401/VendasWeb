@@ -17,8 +17,8 @@ namespace VendasWeb.Models
             get => (int)Math.Floor((DateTime.Now - DataNascimento).TotalDays / 365.2425);
         }
 
-        public List<Endereco> Enderecos { get; set; } = new List<Endereco>();
+        public ICollection<Endereco> Enderecos { get; set; } = new List<Endereco>();
 
-        public List<Pedido> Pedidos { get; set; } = new List<Pedido>(); 
+        public ICollection<Pedido> Pedidos { get; set; } = new List<Pedido>(); 
     }
 }

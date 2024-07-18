@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using VendasWeb.Data;
 
@@ -11,9 +12,11 @@ using VendasWeb.Data;
 namespace VendasWeb.Migrations
 {
     [DbContext(typeof(VendasWebContext))]
-    partial class VendasWebContextModelSnapshot : ModelSnapshot
+    [Migration("20240718123309_V3 Muda de List para Collection as models")]
+    partial class V3MudadeListparaCollectionasmodels
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

@@ -22,6 +22,6 @@ namespace VendasWeb.Models
         [ForeignKey("EnderecoId")]
         public Endereco EnderecoEntrega { get; set; }
 
-        public List<ItemPedido> ItensPedido { get; set; } = new List<ItemPedido>(); 
+        public ICollection<ItemPedido> ItensPedido { get; set; } = new List<ItemPedido>(); 
     }
 }

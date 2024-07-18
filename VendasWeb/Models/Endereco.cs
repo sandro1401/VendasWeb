@@ -32,8 +32,10 @@ namespace VendasWeb.Models
         public string Referencia { get; set; }
 
         public bool Selecionado { get; set; }
+        
+      
 
-        [NotMapped]
+       [NotMapped]
         public string EnderecoCompleto
         {
             get
