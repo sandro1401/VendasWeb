@@ -32,7 +32,9 @@
                 <th>
                     @Html.DisplayNameFor(model => model.Senha)
                 </th>
-                <th></th>
+                <th>
+                    Ações
+                </th>
             </tr>
         </thead>
         <tbody>
@@ -56,11 +58,10 @@
                     </td>
                     <td>
                         <a asp-action="Index" asp-controller="Pedidoes" asp-route-id="@item.IdUsuario" class="btn btn-sm btn-info"><i class="bi-cart" title="Pedidos"></i></a>
-                        <a asp-action="Index" asp-controller="ItemPedidoes" asp-route-id="@item.IdUsuario" class="btn btn-sm btn-primary"><i class="bi-cart" title="Itens Pedidos"></i></a>
                         <a asp-action="Index" asp-controller="Enderecoes" asp-route-id="@item.IdUsuario" class="btn btn-sm btn-success"><i class="bi-mailbox" title="Endereços"></i></a>
                         <a asp-action="Edit" asp-route-id="@item.IdUsuario">Edit</a> |
                         <a asp-action="Details" asp-route-id="@item.IdUsuario">Details</a> |
-                        <a asp-action="Delete" asp-route-id="@item.IdUsuario">Delete</a>
+                        <a asp-action="Delete" asp-route-id="@item.IdUsuario" class="btn btn-sm btn-danger"><i class="bi-trash" title=Delete></i></a>
                     </td>
                 </tr>
             }

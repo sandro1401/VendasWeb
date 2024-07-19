@@ -34,6 +34,9 @@
                 <th>
                     ValorTotal
                 </th>
+                <th>
+                    Ações
+                </th>
                
                 
                 <th></th>
@@ -79,7 +82,7 @@
                         <a asp-action="Index" asp-controller="ItemPedidoes" asp-route-id="@item.IdPedido" class="btn btn-sm btn-info"><i class="bi-list-check" title="Itens do pedido"></i></a>
                         <a asp-action="Edit" asp-route-id="@item.IdPedido">Edit</a> |
                         <a asp-action="Details" asp-route-id="@item.IdPedido">Details</a> |
-                        <a asp-action="Delete" asp-route-id="@item.IdPedido">Delete</a>
+                        <a asp-action="Delete" asp-route-id="@item.IdPedido" class="btn btn-sm btn-danger"><i class="bi-trash" title=Delete></i></a>
                     </td>
                 </tr>
             }
