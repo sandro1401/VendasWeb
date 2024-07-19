@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
@@ -13,57 +14,118 @@ namespace VendasWeb.Controllers
     public class ItemPedidoesController : Controller
     {
         private readonly VendasWebContext _context;
-
-        public ItemPedidoesController(VendasWebContext context)
+        private readonly ILogger<ItemPedidoesController> _logger;
+        public ItemPedidoesController(VendasWebContext context, ILogger<ItemPedidoesController> logger)
         {
             _context = context;
+            _logger = logger;
         }
 
-        // GET: ItemPedidoes
-        public async Task<IActionResult> Index()
-        {
-            return View(await _context.ItemPedido.ToListAsync());
-        }
 
-        // GET: ItemPedidoes/Details/5
-        public async Task<IActionResult> Details(int? id)
+        public async Task<IActionResult> Index(int? id)
         {
-            if (id == null)
+            if (id.HasValue)
             {
-                return NotFound();
-            }
+                if (_context.Pedido.Any(p => p.IdPedido == id))
+                {
+                    var pedido = await _context.Pedido
+                        .Include(p => p.Cliente)
+                        .Include(p => p.ItensPedido.OrderBy(i => i.Produto.Nome))
+                        .ThenInclude(i => i.Produto)
+                        .FirstOrDefaultAsync(p => p.IdPedido == id);
 
-            var itemPedido = await _context.ItemPedido
-                .FirstOrDefaultAsync(m => m.IdPedido == id);
-            if (itemPedido == null)
-            {
-                return NotFound();
+                    ViewBag.Pedido = pedido;
+                    return View(pedido.ItensPedido);
+                }
+                return RedirectToAction("Index", "Clientes");
             }
-
-            return View(itemPedido);
+            return RedirectToAction("Index", "Clientes");
         }
 
-        // GET: ItemPedidoes/Create
-        public IActionResult Create()
+        [HttpGet]
+        public async Task<IActionResult> Create(int? id, int? prod)
         {
-            return View();
+            if (id.HasValue)
+            {
+                if (_context.Pedido.Any(p => p.IdPedido == id))
+                {
+                    var produtos = _context.Produto
+                        .OrderBy(x => x.Nome)
+                        .Select(p => new { p.IdProduto, NomePreco = $"{p.Nome} ({p.Preco:C})" })
+                        .AsNoTracking().ToList();
+                    var produtosSelectList = new SelectList(produtos, "IdProduto", "NomePreco");
+                    ViewBag.Produtos = produtosSelectList;
+
+                    if (prod.HasValue && ItemPedidoExiste(id.Value, prod.Value))
+                    {
+                        var itemPedido = await _context.ItemPedido
+                            .Include(i => i.Produto)
+                            .FirstOrDefaultAsync(i => i.IdPedido == id && i.IdProduto == prod);
+                        return View(itemPedido);
+                    }
+                    else
+                    {
+                        return View(new ItemPedido()
+                        { IdPedido = id.Value, ValorUnitario = 0, Quantidade = 1 });
+                    }
+                }
+                return RedirectToAction("Index", "Cliente");
+            }
+            return RedirectToAction("Index", "Cliente");
         }
 
-        // POST: ItemPedidoes/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        private bool ItemPedidoExiste(int ped, int prod)
+        {
+            return _context.ItemPedido.Any(x => x.IdPedido == ped && x.IdProduto == prod);
+        }
+        
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("IdPedido,IdProduto,Quantidade,ValorUnitario")] ItemPedido itemPedido)
+        public async Task<IActionResult> Create([FromForm] ItemPedido itemPedido)
         {
-            if (ModelState.IsValid)
+            if (itemPedido.IdPedido <= 0)
             {
-                _context.Add(itemPedido);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction("Index", "Clientes");
             }
-            return View(itemPedido);
+
+            var produto = await _context.Produto.FindAsync(itemPedido.IdProduto);
+            if (produto == null)
+            {
+                // Produto não encontrado, retornar erro ou redirecionar
+                ModelState.AddModelError("IdProduto", "Produto não encontrado.");
+                return View(itemPedido);
+            }
+
+            itemPedido.ValorUnitario = produto.Preco;
+
+            if (ItemPedidoExiste(itemPedido.IdPedido, itemPedido.IdProduto))
+            {
+                _context.ItemPedido.Update(itemPedido);
+            }
+            else
+            {
+                _context.ItemPedido.Add(itemPedido);
+            }
+
+            await _context.SaveChangesAsync();
+
+            var pedido = await _context.Pedido.FindAsync(itemPedido.IdPedido);
+            if (pedido == null)
+            {
+                // Pedido não encontrado, retornar erro ou redirecionar
+                ModelState.AddModelError("IdPedido", "Pedido não encontrado.");
+                return View(itemPedido);
+            }
+
+            pedido.ValorTotal = _context.ItemPedido
+                .Where(i => i.IdPedido == itemPedido.IdPedido)
+                .Sum(i => i.ValorUnitario * i.Quantidade);
+
+            _context.Update(pedido);
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction("Index", new { id = itemPedido.IdPedido });
         }
+     
 
         // GET: ItemPedidoes/Edit/5
         public async Task<IActionResult> Edit(int? id)
@@ -95,26 +157,16 @@ namespace VendasWeb.Controllers
 
             if (ModelState.IsValid)
             {
-                try
-                {
+                
                     _context.Update(itemPedido);
                     await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!ItemPedidoExists(itemPedido.IdPedido))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
+
                 return RedirectToAction(nameof(Index));
             }
             return View(itemPedido);
         }
+           
+        
 
         // GET: ItemPedidoes/Delete/5
         public async Task<IActionResult> Delete(int? id)
@@ -149,9 +201,9 @@ namespace VendasWeb.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        private bool ItemPedidoExists(int id)
+        private bool ItemPedidoExists(int ped, int prod)
         {
-            return _context.ItemPedido.Any(e => e.IdPedido == id);
+            return _context.ItemPedido.Any(e => e.IdPedido == ped &&  e.IdProduto == prod);
         }
     }
 }

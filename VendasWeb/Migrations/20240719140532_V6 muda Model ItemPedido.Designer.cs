@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using VendasWeb.Data;
 
@@ -11,9 +12,11 @@ using VendasWeb.Data;
 namespace VendasWeb.Migrations
 {
     [DbContext(typeof(VendasWebContext))]
-    partial class VendasWebContextModelSnapshot : ModelSnapshot
+    [Migration("20240719140532_V6 muda Model ItemPedido")]
+    partial class V6mudaModelItemPedido
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -265,6 +268,12 @@ namespace VendasWeb.Migrations
                     b.Property<int?>("NotaFiscalId")
                         .HasColumnType("int");
 
+                    b.Property<int>("PedidoId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ProdutoId")
+                        .HasColumnType("int");
+
                     b.Property<int>("Quantidade")
                         .HasColumnType("int");
 
@@ -273,9 +282,11 @@ namespace VendasWeb.Migrations
 
                     b.HasKey("IdPedido", "IdProduto");
 
-                    b.HasIndex("IdProduto");
-
                     b.HasIndex("NotaFiscalId");
+
+                    b.HasIndex("PedidoId");
+
+                    b.HasIndex("ProdutoId");
 
                     b.ToTable("ItemPedido");
                 });
@@ -480,21 +491,21 @@ namespace VendasWeb.Migrations
 
             modelBuilder.Entity("VendasWeb.Models.ItemPedido", b =>
                 {
+                    b.HasOne("VendasWeb.Models.NotaFiscal", null)
+                        .WithMany("Itens")
+                        .HasForeignKey("NotaFiscalId");
+
                     b.HasOne("VendasWeb.Models.Pedido", "Pedido")
                         .WithMany("ItensPedido")
-                        .HasForeignKey("IdPedido")
+                        .HasForeignKey("PedidoId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("VendasWeb.Models.Produto", "Produto")
                         .WithMany()
-                        .HasForeignKey("IdProduto")
+                        .HasForeignKey("ProdutoId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.HasOne("VendasWeb.Models.NotaFiscal", null)
-                        .WithMany("Itens")
-                        .HasForeignKey("NotaFiscalId");
 
                     b.Navigation("Pedido");
 

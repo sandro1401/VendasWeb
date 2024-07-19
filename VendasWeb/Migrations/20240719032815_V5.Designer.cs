@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using VendasWeb.Data;
 
@@ -11,9 +12,11 @@ using VendasWeb.Data;
 namespace VendasWeb.Migrations
 {
     [DbContext(typeof(VendasWebContext))]
-    partial class VendasWebContextModelSnapshot : ModelSnapshot
+    [Migration("20240719032815_V5")]
+    partial class V5
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -255,14 +258,18 @@ namespace VendasWeb.Migrations
             modelBuilder.Entity("VendasWeb.Models.ItemPedido", b =>
                 {
                     b.Property<int>("IdPedido")
-                        .HasColumnType("int")
-                        .HasColumnOrder(0);
+                        .HasColumnType("int");
 
                     b.Property<int>("IdProduto")
-                        .HasColumnType("int")
-                        .HasColumnOrder(1);
+                        .HasColumnType("int");
 
                     b.Property<int?>("NotaFiscalId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("PedidoId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ProdutoId")
                         .HasColumnType("int");
 
                     b.Property<int>("Quantidade")
@@ -273,9 +280,11 @@ namespace VendasWeb.Migrations
 
                     b.HasKey("IdPedido", "IdProduto");
 
-                    b.HasIndex("IdProduto");
-
                     b.HasIndex("NotaFiscalId");
+
+                    b.HasIndex("PedidoId");
+
+                    b.HasIndex("ProdutoId");
 
                     b.ToTable("ItemPedido");
                 });
@@ -480,21 +489,21 @@ namespace VendasWeb.Migrations
 
             modelBuilder.Entity("VendasWeb.Models.ItemPedido", b =>
                 {
+                    b.HasOne("VendasWeb.Models.NotaFiscal", null)
+                        .WithMany("Itens")
+                        .HasForeignKey("NotaFiscalId");
+
                     b.HasOne("VendasWeb.Models.Pedido", "Pedido")
                         .WithMany("ItensPedido")
-                        .HasForeignKey("IdPedido")
+                        .HasForeignKey("PedidoId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("VendasWeb.Models.Produto", "Produto")
                         .WithMany()
-                        .HasForeignKey("IdProduto")
+                        .HasForeignKey("ProdutoId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.HasOne("VendasWeb.Models.NotaFiscal", null)
-                        .WithMany("Itens")
-                        .HasForeignKey("NotaFiscalId");
 
                     b.Navigation("Pedido");
 

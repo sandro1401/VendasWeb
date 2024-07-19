@@ -30,6 +30,8 @@ public class VendasWebContext : IdentityDbContext<VendasWebUser>
                 e.ToTable("Pedido");
 
             });
+        builder.Entity<ItemPedido>().HasKey(p => new { p.IdPedido, p.IdProduto });
+        
         base.OnModelCreating(builder);
         // Customize the ASP.NET Identity model and override the defaults if needed.
         // For example, you can rename the ASP.NET Identity table names and more.

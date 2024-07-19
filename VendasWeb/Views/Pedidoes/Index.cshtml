@@ -1,59 +1,92 @@
 ﻿@model IEnumerable<VendasWeb.Models.Pedido>
 
 @{
-    ViewData["Title"] = "Index";
+    var cliente = ViewBag.Cliente as Cliente;
+    ViewBag.Subtitulo = $"Pedidos do Cliente <b>{cliente.Nome}</b>";
 }
 
-<h1>Index</h1>
+<header class="d-flex justify-content-between align-items-center">
+    <div>
+        <h1 class="text-primary">@Html.Raw(ViewBag.Subtitulo)</h1>
+    </div>
+    <div>
+        <a asp-action="Create" asp-route-id="@cliente.IdUsuario" class="btn btn-primary">Novo Pedido</a>
+    </div>
+</header>
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.DataPedido)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.DataEntrega)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.ValorTotal)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.IdCliente)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.IdEntrega)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.DataPedido)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.DataEntrega)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.ValorTotal)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.IdCliente)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.IdEntrega)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.IdPedido">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.IdPedido">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.IdPedido">Delete</a>
-            </td>
-        </tr>
+
+
+
+@if (Model.Count() > 0)
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>
+                    Número
+                </th>
+                <th>
+                    DataPedido
+                </th>
+                <th>
+                    DataEntrega
+                </th>
+                <th>
+                    ValorTotal
+                </th>
+               
+                
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>
+                        @item.IdPedido.ToString("D4")
+                    </td>
+                    <td>
+                        @(item.DataPedido.HasValue ? item.DataPedido : "Em Aberto")
+                    </td>
+                    <td>
+                        @(item.DataEntrega.HasValue ? item.DataEntrega : "Não Entregue")
+                    </td>
+                    <td>
+                        @item.ValorTotal.Value.ToString("C")
+                    </td>
+                    
+                        @if(item.DataPedido.HasValue)
+                        {
+                            <span class="btn btn-sm btn-light"><i class="bi-check-lg text-gray" title="Pedido já fechado"></i></span>
+                        @if (item.DataEntrega.HasValue)
+                        {
+                            <span class="btn btn-sm btn-light"><i class="bi-truck text-gray" title="Pedido já entregue"></i></span>
+                        }
+                        else
+                        {
+                            <a asp-action="Entregar" asp-route-id="@item.IdPedido" class="btn btn-sm btn-warning"><i class="bi-truck" title="Registrar entrega do pedido"></i></a>
+                        }
+
+                    }
+                    else
+                    {
+                        <a asp-action="Fechar" asp-route-id="@item.IdPedido" class="btn btn-sm btn-success"><i class="bi-check-lg" title="Fechar pedido"></i></a>
+                        <span class="btn btn-sm btn-light"><i class="bi-truck text-gray" title="Feche o pedido antes de registrar a entrega"></i></span>
+                    }
+
+                    <td>
+                        <a asp-action="Index" asp-controller="ItemPedidoes" asp-route-id="@item.IdPedido" class="btn btn-sm btn-info"><i class="bi-list-check" title="Itens do pedido"></i></a>
+                        <a asp-action="Edit" asp-route-id="@item.IdPedido">Edit</a> |
+                        <a asp-action="Details" asp-route-id="@item.IdPedido">Details</a> |
+                        <a asp-action="Delete" asp-route-id="@item.IdPedido">Delete</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
 }
-    </tbody>
-</table>
+else
+{
+    <p>Não há nenhum pedido cadastrado para este cliente.</p>
+}

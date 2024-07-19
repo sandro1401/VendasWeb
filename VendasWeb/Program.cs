@@ -13,6 +13,7 @@ builder.Services.AddDefaultIdentity<VendasWebUser>(options => options.SignIn.Req
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+builder.Services.AddLogging();
 
 var app = builder.Build();
 
