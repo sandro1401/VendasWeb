@@ -49,7 +49,10 @@
                 <th>
                     @Html.DisplayNameFor(model => model.Selecionado)
                 </th>
-                <th></th>
+               
+                <th>
+                    Ações
+                </th>
             </tr>
         </thead>
         <tbody>
@@ -83,10 +86,16 @@
                     <td>
                         @Html.DisplayFor(modelItem => item.Selecionado)
                     </td>
+                  
                     <td>
-                        <a asp-action="Edit" asp-route-id="@item.IdEndereco">Edit</a> |
-                        <a asp-action="Details" asp-route-id="@item.IdEndereco">Details</a> |
-                        <a asp-action="Delete" asp-route-id="@item.IdEndereco">Delete</a>
+                        <a asp-action="Edit" asp-route-id="@item.IdEndereco" class="btn btn-sm btn-warning" data-bs-toggle="tooltip" title=" Editar Endereço">
+                            <i class="bi-mailbox"></i>
+                        </a> |
+                        <a asp-action="Details" asp-route-id="@item.IdEndereco" class="btn btn-sm btn-info" data-bs-toggle="tooltip" title="Detalhes do Endereço">
+                            <i class="bi-mailbox"></i>
+                        </a> |
+                        <a asp-action="Delete" asp-route-id="@item.IdEndereco" class="btn btn-sm btn-danger" data-bs-toggle="tooltip" title="Excluir Endereço"><i class="bi-trash"></i></a>
+                    
                     </td>
                 </tr>
             }

@@ -18,7 +18,9 @@
             <th>
                 @Html.DisplayNameFor(model => model.Nome)
             </th>
-            <th></th>
+            <th>
+                Ações
+            </th>
         </tr>
     </thead>
     <tbody>
@@ -28,9 +30,15 @@
                 @Html.DisplayFor(modelItem => item.Nome)
             </td>
             <td>
-                <a asp-action="Edit" asp-route-id="@item.IdCategoria">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.IdCategoria">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.IdCategoria">Delete</a>
+                    <a asp-action="Edit" asp-route-id="@item.IdCategoria" class="btn btn-sm btn-warning" data-bs-toggle="tooltip" title=" Editar Dados da Categoria">
+                        <i class="bi-mailbox"></i>
+                    </a> |
+                    <a asp-action="Details" asp-route-id="@item.IdCategoria" class="btn btn-sm btn-info" data-bs-toggle="tooltip" title="Detalhes da Categoria">
+                        <i class="bi-mailbox"></i>
+                    </a> |
+                    <a asp-action="Delete" asp-route-id="@item.IdCategoria" class="btn btn-sm btn-danger" class="bi-trash" data-bs-toggle="tooltip" title="Excluir Categoria">
+                        <i class="bi-mailbox"></i>
+                    </a>
             </td>
         </tr>
 }

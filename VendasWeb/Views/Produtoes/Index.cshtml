@@ -52,9 +52,14 @@
                         @Html.DisplayFor(modelItem => item.Categoria.Nome)
                     </td>
                     <td>
-                        <a asp-action="Edit" asp-route-id="@item.IdProduto">Edit</a> |
-                        <a asp-action="Details" asp-route-id="@item.IdProduto">Details</a> |
-                        <a asp-action="Delete" asp-route-id="@item.IdProduto" class="btn btn-sm btn-danger"><i class="bi-trash" title=Delete></i></a>
+                        <a asp-action="Edit" asp-route-id="@item.IdProduto" class="btn btn-sm btn-warning" data-bs-toggle="tooltip" title=" Editar Dados do Produto">
+                            <i class="bi-mailbox"></i>
+                        </a> |
+                        <a asp-action="Details" asp-route-id="@item.IdProduto" class="btn btn-sm btn-info" data-bs-toggle="tooltip" title="Detalhes do Produto">
+                            <i class="bi-mailbox"></i>
+                        </a> |
+                            <a asp-action="Delete" asp-route-id="@item.IdProduto" class="btn btn-sm btn-danger" class="bi-trash" data-bs-toggle="tooltip" title="Excluir Produto">
+                                    <i class="bi-mailbox"></i></a>
                     </td>
                 </tr>
             }

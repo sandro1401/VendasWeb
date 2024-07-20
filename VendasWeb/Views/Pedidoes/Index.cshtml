@@ -58,7 +58,7 @@
                     <td>
                         @item.ValorTotal.Value.ToString("C")
                     </td>
-                    
+                    <td>
                         @if(item.DataPedido.HasValue)
                         {
                             <span class="btn btn-sm btn-light"><i class="bi-check-lg text-gray" title="Pedido já fechado"></i></span>
@@ -68,19 +68,20 @@
                         }
                         else
                         {
-                            <a asp-action="Entregar" asp-route-id="@item.IdPedido" class="btn btn-sm btn-warning"><i class="bi-truck" title="Registrar entrega do pedido"></i></a>
+                                <a asp-action="Entregar" asp-route-id="@item.IdPedido" class="btn btn-sm btn-primary"
+                            class="bi-truck" data-bs-toggle="tooltip" title="Registrar entrega do pedido"><i class="bi-mailbox"></i></a>
                         }
-
                     }
-                   
-
-                    <td>
-                        <a asp-action="Fechar" asp-route-id="@item.IdPedido" class="btn btn-sm btn-success"><i class="bi-check-lg" title="Fechar pedido"></i></a>
-                        <span class="btn btn-sm btn-light"><i class="bi-truck text-gray" title="Feche o pedido antes de registrar a entrega"></i></span>
-                        <a asp-action="Index" asp-controller="ItemPedidoes" asp-route-id="@item.IdPedido" class="btn btn-sm btn-info"><i class="bi-list-check" title="Itens do pedido"></i></a>
-                        <a asp-action="Edit" asp-route-id="@item.IdPedido">Edit</a> |
-                        <a asp-action="Details" asp-route-id="@item.IdPedido">Details</a> |
-                        <a asp-action="Delete" asp-route-id="@item.IdPedido" class="btn btn-sm btn-danger"><i class="bi-trash" title=Delete></i></a>
+                    else
+                    {
+                        <a asp-action="Fechar" asp-route-id="@item.IdPedido" class="btn btn-sm btn-success" data-bs-toggle="tooltip" title="Fechar Pedido">
+                            <i class="bi-mailbox"></i></a>
+ 
+                    }
+                        <a asp-action="Index" asp-controller="ItemPedidoes" asp-route-id="@item.IdPedido" class="btn btn-sm btn-info" class="bi-list-check" data-bs-toggle="tooltip" title="Itens do pedido"><i class="bi-mailbox"></i></a> |
+                        <a asp-action="Edit" asp-route-id="@item.IdPedido" class="btn btn-sm btn-warning" data-bs-toggle="tooltip" title=" Editar Dados do Pedido"><i class="bi-mailbox"></i></a> |
+                        <a asp-action="Details" asp-route-id="@item.IdPedido" class="btn btn-sm btn-info" data-bs-toggle="tooltip" title=" Detalhes do Pedido"><i class="bi-mailbox"></i></a> |
+                        <a asp-action="Delete" asp-route-id="@item.IdPedido" class="btn btn-sm btn-danger" data-bs-toggle="tooltip" title=" Excluir Pedido"><i class="bi-mailbox"></i></a>
                     </td>
                 </tr>
             }
