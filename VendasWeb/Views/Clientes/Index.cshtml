@@ -57,11 +57,19 @@
                         @Html.DisplayFor(modelItem => item.Senha)
                     </td>
                     <td>
-                        <a asp-action="Index" asp-controller="Pedidoes" asp-route-id="@item.IdUsuario" class="btn btn-sm btn-info"><i class="bi-cart" title="Pedidos"></i></a>
-                        <a asp-action="Index" asp-controller="Enderecoes" asp-route-id="@item.IdUsuario" class="btn btn-sm btn-success"><i class="bi-mailbox" title="Endereços"></i></a>
-                        <a asp-action="Edit" asp-route-id="@item.IdUsuario">Edit</a> |
-                        <a asp-action="Details" asp-route-id="@item.IdUsuario">Details</a> |
-                        <a asp-action="Delete" asp-route-id="@item.IdUsuario" class="btn btn-sm btn-danger"><i class="bi-trash" title=Delete></i></a>
+                        <a asp-action="Index" asp-controller="Pedidoes" asp-route-id="@item.IdUsuario" class="btn btn-sm btn-primary" data-bs-toggle="tooltip" title="Pedidos">
+                            <i class="bi-mailbox"></i>
+                        </a> |
+                        <a asp-action="Index" asp-controller="Enderecoes" asp-route-id="@item.IdUsuario" class="btn btn-sm btn-success" data-bs-toggle="tooltip" title="Endereços">
+                            <i class="bi-mailbox"></i>
+                        </a> |
+
+                        <a asp-action="Edit" asp-route-id="@item.IdUsuario" class="btn btn-sm btn-warning" data-bs-toggle="tooltip" title=" Editar Dados do Cliente">
+                            <i class="bi-mailbox"></i></a> |
+                        <a asp-action="Details" asp-route-id="@item.IdUsuario" class="btn btn-sm btn-info" data-bs-toggle="tooltip" title="Detalhes do Cliente">
+                                <i class="bi-mailbox"></i>
+                        </a> |
+                        <a asp-action="Delete" asp-route-id="@item.IdUsuario" class="btn btn-sm btn-danger" data-bs-toggle="tooltip" title="Excluir Cliente"><i class="bi-trash"></i></a>
                     </td>
                 </tr>
             }
