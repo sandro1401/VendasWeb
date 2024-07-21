@@ -55,10 +55,9 @@
                     @if (!pedido.DataPedido.HasValue)
                     {
                         <td>
-                            <a asp-action="Create" asp-route-id="@itemPedido.IdPedido" asp-route-prod="@itemPedido.IdProduto"
-                               class="btn btn-sm btn-secondary"><i class="bi-pencil" title="Alterar"></i></a>
+                            
                             <a asp-action="Delete" asp-route-id="@itemPedido.IdPedido" asp-route-prod="@itemPedido.IdProduto"
-                               class="btn btn-sm btn-danger"><i class="bi-trash" title="Excluir"></i></a>
+                               class="btn btn-sm btn-danger" data-bs-toggle="tooltip" title="Excluir Item do Pedido"><i class="bi-trash"></i></a>
                         </td>
                     }
                 </tr>
