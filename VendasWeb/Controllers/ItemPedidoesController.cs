@@ -169,15 +169,16 @@ namespace VendasWeb.Controllers
         
 
         // GET: ItemPedidoes/Delete/5
-        public async Task<IActionResult> Delete(int? id)
+        public async Task<IActionResult> Delete(int? id, int? prod)
         {
-            if (id == null)
+            if (id == null || prod == null)
             {
                 return NotFound();
             }
 
             var itemPedido = await _context.ItemPedido
-                .FirstOrDefaultAsync(m => m.IdPedido == id);
+                .Include(i => i.Produto) 
+                .FirstOrDefaultAsync(i => i.IdPedido == id && i.IdProduto == prod);
             if (itemPedido == null)
             {
                 return NotFound();
@@ -187,19 +188,33 @@ namespace VendasWeb.Controllers
         }
 
         // POST: ItemPedidoes/Delete/5
-        [HttpPost, ActionName("Delete")]
+        [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
+        public async Task<IActionResult> Delete(int idPedido, int idProduto)
         {
-            var itemPedido = await _context.ItemPedido.FindAsync(id);
+            var itemPedido = await _context.ItemPedido.FindAsync(idPedido, idProduto);
             if (itemPedido != null)
             {
                 _context.ItemPedido.Remove(itemPedido);
+                if (await _context.SaveChangesAsync() > 0)
+                {
+                    var pedido = await _context.Pedido.FindAsync(itemPedido.IdPedido);
+                    pedido.ValorTotal = _context.ItemPedido
+                        .Where(i => i.IdPedido == itemPedido.IdPedido)
+                        .Sum(i => i.ValorUnitario * i.Quantidade);
+                    await _context.SaveChangesAsync();
+                }
+                else
+                return RedirectToAction("Index", new { ped = idPedido });
             }
-
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+            else
+            {
+                return RedirectToAction("Index", new { ped = idPedido });
+            }
+            return RedirectToAction("Index");
         }
+            
+        
 
         private bool ItemPedidoExists(int ped, int prod)
         {
