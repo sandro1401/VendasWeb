@@ -1,0 +1,31 @@
+﻿﻿<h1>Information Report</h1>
+@{
+    ViewData["Title"] = "Relatório de Produtos";
+    var relatorioProdutos = ViewData["RelatorioProdutos"] as List<VendasWeb.Models.ViewModels.ProdutoRelatorioViewModel>;
+}
+<h1>Relatório de Produtos</h1>
+
+<p>Total de Produtos: @ViewData["TotalProdutos"]</p>
+<p>Menor Quantidade em Estoque: @ViewData["MenorQuant"]</p>
+<p>Maior Quantidade em Estoque: @ViewData["MaiorQuant"]</p>
+<p>Média de Produtos em Estoque: @ViewData["Media"]</p>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Nome do Produto</th>
+            <th>Quantidade em Estoque</th>
+            <th>Categoria</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var produto in relatorioProdutos)
+        {
+            <tr>
+                <td>@produto.Nome</td>
+                <td>@produto.Estoque</td>
+                <td>@produto.Categoria</td>
+            </tr>
+        }
+    </tbody>
+</table>

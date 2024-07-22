@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using VendasWeb.Data;
 using VendasWeb.Models;
+using VendasWeb.Models.ViewModels;
 
 namespace VendasWeb.Controllers
 {
@@ -145,6 +146,28 @@ namespace VendasWeb.Controllers
         private bool ProdutoExists(int id)
         {
             return _context.Produto.Any(e => e.IdProduto == id);
+        }
+
+        public IActionResult Report() { 
+        
+            var produtos = _context.Produto.Include("Categoria").ToList();
+
+            var relatorio = produtos.Select(p => new ProdutoRelatorioViewModel
+            {
+                Nome = p.Nome,
+                Estoque = p.Estoque,
+                Categoria = p.Categoria.Nome
+            }).ToList();
+
+            ViewData["TotalProdutos"] = produtos.Sum(s => s.Estoque);
+            ViewData["MenorQuant"] = produtos.Min(s => s.Estoque);
+            ViewData["MaiorQuant"] = produtos.Max(s => s.Estoque);
+            ViewData["Media"] = produtos.Average(s => s.Estoque).ToString("F2");
+            ViewData["RelatorioProdutos"] = relatorio;
+
+
+                
+            return View();
         }
     }
 }

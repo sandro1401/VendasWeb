@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using VendasWeb.Data;
 using VendasWeb.Models;
+using VendasWeb.Models.ViewModels;
 
 namespace VendasWeb.Controllers
 {
